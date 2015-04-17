@@ -238,6 +238,10 @@ def main():
     restore_parser.add_argument('--merge-dir',
                                 default='.',
                                 help="Parent of the temp folder storing the merge SSTables of all backups")
+    restore_parser.add_argument('--overwrite-local',
+                                action='store_true',
+                                help="If provided, the processes with download from s3 to the local directory "
+                                     "overwriting any other files there")
 
     args = base_parser.parse_args()
     subcommand = args.subcommand

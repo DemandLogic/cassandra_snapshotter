@@ -93,7 +93,8 @@ class Snapshot(object):
 
 
 class RestoreWorker(object):
-    def __init__(self, aws_access_key_id, aws_secret_access_key, snapshot, local_source='', merge_dir='.'):
+    def __init__(self, aws_access_key_id, aws_secret_access_key, snapshot, local_source='',
+                 merge_dir='.', overwrite_local_source=False):
 
         if not local_source:
             self.aws_secret_access_key = aws_secret_access_key
@@ -106,7 +107,11 @@ class RestoreWorker(object):
 
         self.local_source = local_source
         self.merge_dir = merge_dir
-        
+        self.overwrite_local_source = overwrite_local_source
+
+        if local_source and not os.path.exists(local_source) :
+            os.makedirs(local_source)
+
         self.path_separator = os.path.sep
         
     def restore(self, keyspace, table, hosts, target_hosts):
@@ -176,7 +181,7 @@ class RestoreWorker(object):
         matcher_string = "(%(hosts)s).*/(%(keyspace)s)/(%(table)s)/" % dict(hosts='|'.join(hosts), keyspace=keyspace, table=table)
         self.keyspace_table_matcher = re.compile(matcher_string)
 
-        if self.local_source:
+        if self.local_source :
             logging.info("Restoring keyspace=%(keyspace)s, table=%(table)s, "
                      "from existing local data: %(local_dir)s " % dict(keyspace=keyspace,
                                                                            table=table, local_dir=self.local_source))
@@ -226,7 +231,7 @@ class RestoreWorker(object):
 
         thread_pool = Pool(pool_size)
 
-        if self.local_source:
+        if self.local_source and not self.overwrite_local_source:
             meth = self._copy_key
 
         else:
@@ -265,11 +270,13 @@ class RestoreWorker(object):
     def _copy_key(self, key):
         dst = self.dst_from_key(path=key)
         shutil.copy2(src=key, dst=dst)
-
         return os.path.getsize(key)
 
     def _download_key(self, key):
-        dst = self.dst_from_key(path=key.name)
+        path = key.name
+        if self.local_source:
+            path = os.path.join(self.local_source, key.name)
+        dst = self.dst_from_key(path=path)
         logging.info("downloading %(key)s to %(filename)s" % dict(key=key.name, filename=dst))
         key.get_contents_to_filename(dst)
         return key.size
