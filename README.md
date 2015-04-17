@@ -133,5 +133,4 @@ However, if you fetched the latest, this will be a timestamp reflecting the most
 Another option will be the NEW-HOSTNAMES which is a comma separated list of hostnames for your cluster.
 
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/tbarbugli/cassandra_snapshotter/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
