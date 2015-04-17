@@ -96,7 +96,7 @@ class RestoreWorker(object):
     def __init__(self, aws_access_key_id, aws_secret_access_key, snapshot, local_source='',
                  merge_dir='.', overwrite_local_source=False):
 
-        if not local_source:
+        if not local_source or overwrite_local_source:
             self.aws_secret_access_key = aws_secret_access_key
             self.aws_access_key_id = aws_access_key_id
             self.s3connection = S3Connection(aws_access_key_id=self.aws_access_key_id,
@@ -181,7 +181,7 @@ class RestoreWorker(object):
         matcher_string = "(%(hosts)s).*/(%(keyspace)s)/(%(table)s)/" % dict(hosts='|'.join(hosts), keyspace=keyspace, table=table)
         self.keyspace_table_matcher = re.compile(matcher_string)
 
-        if self.local_source :
+        if self.local_source and not self.overwrite_local_source :
             logging.info("Restoring keyspace=%(keyspace)s, table=%(table)s, "
                      "from existing local data: %(local_dir)s " % dict(keyspace=keyspace,
                                                                            table=table, local_dir=self.local_source))

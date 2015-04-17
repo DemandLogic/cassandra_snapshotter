@@ -105,6 +105,33 @@ In case you need, cassandra_snapshotter stores the ring token description every 
 
 The way data is stored on S3 should makes it really easy to use the Node Restart Method (http://www.datastax.com/documentation/cassandra/2.0/webhelp/index.html#cassandra/operations/ops_backup_snapshot_restore_t.html#task_ds_cmf_11r_gk)
 
+```
+python /path/to/cassandra_snapshotter/cassandra_snapshotter/main.py --verbose  \
+    --aws-access-key-id=YOUR-AWS-ACCESS-KEY \
+    --aws-secret-access-key=YOUR-AWS-SECRET \
+    --s3-bucket-region=S3-REGION \
+    --s3-bucket-name=S3-BUCKET-NAME \
+    --s3-base-path=CASSANDRA-CLUSTER-NAME \
+    restore \
+        --keyspace=live_dlphi \
+        -- snapshot-name=NAME-OF-SNAPSHOT
+        --target-hosts=NEW-HOSTNAMES
+        --local-source=LOCAL-BASE-PATH-FOR-DOWNLOADS-FROM-S3 \
+        --merge-dir=PATH-TO-A-DIRECTORY-TO-HOLD-TMP-FILES-ON-MERGE \
+        --overwrite-local
+
+The options in ALL CAPITALS are the ones you'd need to specify.
+
+Of note, the NAME-OF-SNAPSHOT is the id given in the download. For example where the directory is:
+CLUSTERNAME/20150116020901/NODE.IPDOMMAIN/var/lib/cassandra/data/KEYSPACE/etc.../
+
+The snapshot name will be:
+20150116020901
+
+However, if you fetched the latest, this will be a timestamp reflecting the most recent snapshot.
+
+Another option will be the NEW-HOSTNAMES which is a comma separated list of hostnames for your cluster.
+
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/tbarbugli/cassandra_snapshotter/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
