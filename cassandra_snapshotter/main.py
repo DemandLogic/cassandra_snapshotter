@@ -116,12 +116,14 @@ def restore_backup(args):
         if args.snapshot_name == 'LATEST':
             snapshot = snapshots.get_latest()
         else:
-            snapshot = snapshots.get_snapshot_by_name(args.backup_name)
+            snapshot = snapshots.get_snapshot_by_name(args.snapshot_name)
 
-    worker = RestoreWorker(aws_access_key_id=args.aws_access_key_id,
-                           aws_secret_access_key=args.aws_secret_access_key,
-                           snapshot=snapshot,local_source=args.local_source, merge_dir=args.merge_dir,
-                           overwrite_local_source=args.overwrite_local)
+    worker = RestoreWorker(
+        aws_access_key_id=args.aws_access_key_id,
+        aws_secret_access_key=args.aws_secret_access_key,
+        snapshot=snapshot, local_source=args.local_source, merge_dir=args.merge_dir,
+        overwrite_local_merge=args.overwrite_local
+    )
 
     if args.hosts:
         hosts = args.hosts.split(',')
