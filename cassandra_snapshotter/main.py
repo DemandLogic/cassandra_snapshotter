@@ -11,6 +11,17 @@ from utils import get_s3_connection_host
 
 env.use_ssh_config = True
 
+def add_console_handler(log_level):
+    date_fmt = '%d-%m-%YT%H:%M:%S'
+    log_formatter = logging.Formatter(u'[%(asctime)s] %(levelname)-4s: %(message)s (%(filename)s : %(funcName)s : line %('
+                           u'lineno)d)['
+                        u': <thread>%(thread)d]', datefmt=date_fmt)
+
+    stdoutHandler  = logging.StreamHandler() #CONSOLE HANDLER
+    stdoutHandler.setFormatter(log_formatter)
+    stdoutHandler.setLevel(log_level)
+    logging.getLogger().setLevel(log_level)
+    logging.getLogger().addHandler(stdoutHandler )
 
 def run_backup(args):
     if args.user:
@@ -250,7 +261,7 @@ def main():
     subcommand = args.subcommand
 
     if args.verbose:
-        logging.basicConfig(level=logging.INFO)
+        add_console_handler(log_level=logging.INFO)
 
     if subcommand == 'backup':
         run_backup(args)
