@@ -173,8 +173,7 @@ class RestoreWorker(object):
         # 4. sstableloader
 
         logging.info("Restoring Cassandra data from hosts: %(hosts)s to: %(target_hosts)s" % dict(hosts=', '.join(hosts),
-                                                                         target_hosts=', '.join(
-                                                                             target_hosts)))
+                                                                         target_hosts=', '.join( target_hosts )))
         if not table:
             table = ".*?"
 
@@ -212,11 +211,15 @@ class RestoreWorker(object):
 
         keyspace_path = os.path.join(self.merge_dir, keyspace)
 
-        logging.info("Clearing / recreating merge directory: %s" % keyspace_path)
-
-        if self.overwrite_local_merge and os.path.exists(keyspace_path) and os.path.isdir(keyspace_path):
-            logging.warning("======> DELETING AND OVERWRITING EXISTING MERGE PATH (%s)..." % keyspace_path)
-            shutil.rmtree(keyspace_path)
+        if self.overwrite_local_merge :
+            logging.info("Clearing / recreating merge directory: %s" % keyspace_path)
+            if os.path.exists(keyspace_path) and os.path.isdir(keyspace_path):
+                logging.warning("======> DELETING AND OVERWRITING EXISTING MERGE PATH (%s)..." % keyspace_path)
+                shutil.rmtree(keyspace_path)
+        elif os.path.exists(keyspace_path):
+            logging.info("Overwrite of existing merge data is not selected. Leaving any existing merge data in "
+                         "directory in place: %s" %
+                         keyspace_path)
 
         for table in tables:
             path = os.path.join(keyspace_path, table)
