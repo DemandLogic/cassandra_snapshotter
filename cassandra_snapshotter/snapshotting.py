@@ -1,5 +1,5 @@
 import re
-import shutil, glob
+import shutil
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 from boto.exception import S3ResponseError
@@ -10,6 +10,7 @@ from fabric.api import hide
 from fabric.api import run
 from fabric.api import sudo
 from fabric.context_managers import settings, prefix
+
 from multiprocessing.dummy import Pool
 import json
 import logging
@@ -254,6 +255,23 @@ class RestoreWorker(object):
             progress_string = "%s%s\r" % (progress_string, padding)
 
             sys.stderr.write(progress_string)
+
+    def decompress_to_file(inpath, output=None):
+        """
+        returns a generator that yields compressed chunks of
+        the given file_path
+
+        compression is done with lzop
+
+        """
+
+
+        while True:
+            chunk = lzop.stdout.read(BUFFER_SIZE)
+            if not chunk:
+                break
+            yield StringIO(chunk)
+
 
     def dst_from_key(self, path):
         r = self.keyspace_table_matcher.search(path)
